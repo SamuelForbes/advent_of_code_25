@@ -29,24 +29,50 @@ fn part_two(input: &str) -> u64 {
 }
 
 fn calculate_larger_joltage(input: &str) -> u64 {
-    let mut values: Vec<u32> = input.chars().map(|x| x.to_digit(10).unwrap()).collect();
-    let lead_digit = values[0..values.len() - 12].iter().max().unwrap();
-    let lead_digit_position = values.iter().position(|x| x == lead_digit).unwrap();
+    let values: Vec<u32> = input.chars().map(|x| x.to_digit(10).unwrap()).collect();
 
-    while values.len() > 12 {
-        let min = values.iter().min().unwrap();
-        let min_position = values.iter().position(|x| x == min).unwrap();
-        values.remove(min_position);
-    }
-
-    println!("{input}, {lead_digit_position}, {values:?}");
-
-    values
+    find_positions(&values)
         .iter()
-        .map(ToString::to_string)
+        .map(|i| values[*i].to_string())
         .collect::<String>()
         .parse()
         .unwrap()
+}
+
+fn find_positions(values: &[u32]) -> Vec<usize> {
+    let mut positions = vec![];
+    let mut highest_digit = *values.iter().max().unwrap();
+    let mut window = 0..values.len();
+
+    while positions.len() < 12 {
+        println!("{window:?}");
+        let potential_positions: Vec<usize> = values
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| window.contains(i))
+            .filter(|(_, x)| **x == highest_digit)
+            .map(|(i, _)| i)
+            .collect();
+
+        for position in potential_positions.iter().rev() {
+            if positions.len() < 12 && !positions.contains(position) {
+                positions.push(*position);
+            }
+        }
+
+        let last_position = positions.last().unwrap();
+        println!("{},{},{}", values.len(), positions.len(), last_position);
+        if values.len() - *last_position > 12 - positions.len() {
+            window = *last_position..values.len();
+        }
+
+        positions.sort_unstable();
+        println!("{positions:?}");
+
+        highest_digit -= 1;
+    }
+
+    positions
 }
 
 #[test]
@@ -58,4 +84,10 @@ fn small_input() {
 
     assert_eq!(357, part_one(input));
     assert_eq!(3_121_910_778_619, part_two(input));
+}
+
+#[test]
+fn edge_case() {
+    let input = "999999999911897";
+    assert_eq!(999_999_999_997, calculate_larger_joltage(input));
 }

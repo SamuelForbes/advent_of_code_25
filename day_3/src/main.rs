@@ -29,16 +29,18 @@ fn part_two(input: &str) -> u64 {
 }
 
 fn calculate_larger_joltage(input: &str) -> u64 {
-    println!("{input}");
     let values: Vec<u32> = input.chars().map(|x| x.to_digit(10).unwrap()).collect();
 
-    find_positions(&values)
+    let result = find_positions(&values)
         .iter()
         .map(|i| values[*i].to_string())
-        .inspect(|x|println!("{x}"))
         .collect::<String>()
         .parse()
-        .unwrap()
+        .unwrap();
+
+    println!("{input} - {result}");
+
+    result
 }
 
 fn find_positions(values: &[u32]) -> Vec<usize> {

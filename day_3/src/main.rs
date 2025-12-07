@@ -29,11 +29,13 @@ fn part_two(input: &str) -> u64 {
 }
 
 fn calculate_larger_joltage(input: &str) -> u64 {
+    println!("{input}");
     let values: Vec<u32> = input.chars().map(|x| x.to_digit(10).unwrap()).collect();
 
     find_positions(&values)
         .iter()
         .map(|i| values[*i].to_string())
+        .inspect(|x|println!("{x}"))
         .collect::<String>()
         .parse()
         .unwrap()
@@ -45,7 +47,6 @@ fn find_positions(values: &[u32]) -> Vec<usize> {
     let mut window = 0..values.len();
 
     while positions.len() < 12 {
-        println!("{window:?}");
         let potential_positions: Vec<usize> = values
             .iter()
             .enumerate()
@@ -60,14 +61,15 @@ fn find_positions(values: &[u32]) -> Vec<usize> {
             }
         }
 
+        positions.sort_unstable();
+
         let last_position = positions.last().unwrap();
-        println!("{},{},{}", values.len(), positions.len(), last_position);
+        let first_position = positions.first().unwrap();
         if values.len() - *last_position > 12 - positions.len() {
             window = *last_position..values.len();
+        } else if first_position + 12 < values.len() {
+            window = *first_position..values.len();
         }
-
-        positions.sort_unstable();
-        println!("{positions:?}");
 
         highest_digit -= 1;
     }
@@ -83,11 +85,10 @@ fn small_input() {
 818181911112111";
 
     assert_eq!(357, part_one(input));
+    assert_eq!(987_654_321_111, calculate_larger_joltage("987654321111111"));
+    assert_eq!(811_111_111_119, calculate_larger_joltage("811111111111119"));
+    assert_eq!(434_234_234_278, calculate_larger_joltage("234234234234278"));
+    assert_eq!(888_911_112_111, calculate_larger_joltage("818181911112111"));
+    assert_eq!(999_999_999_997, calculate_larger_joltage("999999999911897"));
     assert_eq!(3_121_910_778_619, part_two(input));
-}
-
-#[test]
-fn edge_case() {
-    let input = "999999999911897";
-    assert_eq!(999_999_999_997, calculate_larger_joltage(input));
 }

@@ -28,7 +28,7 @@ fn part_one(input: &str) -> u32 {
 }
 
 fn part_two(input: &str) -> u64 {
-    let mut ranges = parse_input(input).0;
+    let ranges = parse_input(input).0;
     let mut unique_ranges: Vec<RangeInclusive<u64>> = vec![ranges[0].clone()];
 
     'outer: for i in 0..ranges.len() {
@@ -53,8 +53,9 @@ fn part_two(input: &str) -> u64 {
 
                 range = *start..=*end;
                 unique_ranges.remove(j);
+            } else {
+                j += 1;
             }
-            j += 1;
         }
 
         unique_ranges.push(range);
@@ -62,7 +63,7 @@ fn part_two(input: &str) -> u64 {
 
     unique_ranges
         .iter()
-        .map(|range| range.end() - range.start())
+        .map(|range| range.end() + 1 - range.start())
         .sum()
 }
 
@@ -76,7 +77,7 @@ fn range_intersects(range1: &RangeInclusive<u64>, range2: &RangeInclusive<u64>) 
 }
 
 fn parse_input(input: &str) -> (Vec<RangeInclusive<u64>>, Vec<u64>) {
-    let parts = input.split_once("\n\n").unwrap();
+    let parts = input.split_once("\n\n").unwrap_or_else(|| input.split_once("\r\n\r\n").unwrap());
 
     let ranges = parts
         .0

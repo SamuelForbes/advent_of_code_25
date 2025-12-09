@@ -7,9 +7,9 @@ fn main() {
 
     let mut start = Instant::now();
     println!("{} - {:?}", part_one(&input), start.elapsed());
-    //
-    // start = Instant::now();
-    // println!("{} - {:?}", part_two(&input), start.elapsed());
+
+    start = Instant::now();
+    println!("{} - {:?}", part_two(&input), start.elapsed());
 }
 
 fn part_one(input: &str) -> u32 {
@@ -23,12 +23,8 @@ fn part_one(input: &str) -> u32 {
         let mut new_beams = HashSet::new();
         for beam in &mut beams.iter() {
             if row[*beam] == '^' {
-                if *beam != 0 {
-                    new_beams.insert(beam - 1);
-                }
-                if *beam != row.len() - 1 {
-                    new_beams.insert(beam + 1);
-                }
+                new_beams.insert(beam - 1);
+                new_beams.insert(beam + 1);
                 split_count += 1;
             } else {
                 new_beams.insert(*beam);
@@ -40,8 +36,28 @@ fn part_one(input: &str) -> u32 {
     split_count
 }
 
+fn part_two(input: &str) -> usize {
+    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+    let mut beams = vec![grid[0].iter().position(|c| *c == 'S').unwrap()];
+    
+    for row in grid {
+        let mut new_beams = vec![];
+        for beam in &mut beams.iter() {
+            if row[*beam] == '^' {
+                new_beams.push(beam - 1);
+                new_beams.push(beam + 1);
+            } else {
+                new_beams.push(*beam);
+            }
+        }
+        beams = new_beams;
+    }
+
+    beams.len()
+}
+
 #[test]
-fn small_input(){
+fn small_input() {
     let input = ".......S.......
 ...............
 .......^.......
@@ -59,4 +75,5 @@ fn small_input(){
 .^.^.^.^.^...^.
 ...............";
     assert_eq!(21, part_one(input));
+    assert_eq!(40, part_two(input));
 }
